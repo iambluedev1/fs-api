@@ -10,6 +10,8 @@ Webscraper for the website [french-stream.co](http://french-stream.co/)
 ### Usage
 > npm start
 
+or
+
 > npm run dev
 
 The webscraper is listening on the port 8080.
@@ -135,4 +137,4 @@ For */raw/16550/comments* :
 
 ## Disclaimers
 
-This is an unofficial api of the website [french-stream.co](http://french-stream.co/). I'm not the owner of this website, and I don't know there owners.
+This is an unofficial api of the website [french-stream.co](http://french-stream.co/). I'm not the owner of this website, and I don't know its owners.
