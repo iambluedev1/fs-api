@@ -3,15 +3,18 @@
 Webscraper for the website [french-stream.co](http://french-stream.co/)
 
 ### Install
-> git clone https://github.com/iambluedev1/frenchstream-webscraper.git
+> git clone https://github.com/iambluedev1/fs-api.git
+
 > npm install
 
 ### Usage
-> node index.js
+> npm start
+
+> npm run dev
 
 The webscraper is listening on the port 8080.
 
-###RESTful API
+### RESTful API
 
 |  Path | Example | Description
 | ------------ | ------------ | ------------ |
@@ -21,7 +24,7 @@ The webscraper is listening on the port 8080.
 | /fetch/genres/{flag}/{genre_id}/{page}  |  /fetch/genres/movies/1/5  | Return a list of items corresponding to a specific genre and flag values
 | /raw/{video_id}/{tag}  |  /raw/16550/{comment}  | Get datas of a video
 
-####Params
+#### Params
 
 |  Param  | Possible values |
 | ------------ | ------------ |
@@ -32,7 +35,7 @@ The webscraper is listening on the port 8080.
 | video_id  | This is the video is, for example for the movie [Racific Rim Uprising](http://french-stream.co/16550-pacific-rim-uprising.html), the id is 16550 (it can be viewed in the url) |
 | tag  |  Right now, the only tag you can use is "comments", it's used to display comments of a video  |
 
-####Responses
+#### Responses
 
 For */get/movies/1* :
 ```json
@@ -44,7 +47,7 @@ For */get/movies/1* :
 	"img":"http://french-stream.co//img/french-stream.com.php?src=http://fr.web.img6.acsta.net/c_215_290/pictures/18/01/24/17/09/1857016.jpg&w=190&h=260"
 }, ... ]
 ```
-For */fetch/boxoffice/154*
+For */fetch/boxoffice/154* :
 ```json
 [{
 	"title":"Le scaphandre et le papillon",
@@ -113,7 +116,8 @@ For */raw/16550* :
 		"http://french-stream.co/f.php?p_id=1&&c_id=UkVoUk9GTkRSMU5GU0V4S0xtaDBiV3c9",
 		"http://french-stream.co/yy.php?p_id=2&&c_id=UW10NGVGZE5UVnBTY0VrPQ==",
 		"http://french-stream.co/yy.php?p_id=3&&c_id=WlhWeE0yVm5PR3RwWVdndw=="
-	]}
+	]
+}
 ```
 
 For */raw/16550/comments* :
