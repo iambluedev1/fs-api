@@ -1,4 +1,4 @@
-#FrenchStream Unofficial Api
+# FrenchStream Unofficial Api
 
 Webscraper for the website [french-stream.co](http://french-stream.co/)
 
