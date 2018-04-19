@@ -135,6 +135,10 @@ For */raw/16550/comments* :
 }
 ```
 
+## Demo
+
+You can view a demo at : http://fs-api.cf
+
 ## Disclaimers
 
 This is an unofficial api of the website [french-stream.co](http://french-stream.co/). I'm not the owner of this website, and I don't know its owners.
