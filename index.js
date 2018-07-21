@@ -1,17 +1,33 @@
 var express = require('express');
 var fs = require('fs');
+var path = require('path');
 var request = require('request');
 var syncRequest = require('sync-request');
 var cheerio = require('cheerio');
 var cheerioAdv = require('cheerio-advanced-selectors')
 var apicache = require('apicache');
+var morgan = require('morgan');
 
-cheerio = cheerioAdv.wrap(cheerio)
+cheerio = cheerioAdv.wrap(cheerio);
 var app = express();
 var cache = apicache.middleware;
 
 var categories = require('./categories.js');
 var genres = require('./genres.js');
+
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'});
+var formats = ":remote-addr [:date[iso]] [method=':method', url=':url', status=':status', user-agent=':user-agent', response-time=':response-time']";
+
+morgan.token('remote-addr', function(req){
+  if(req.headers['cf-connecting-ip']){
+    return req.headers['cf-connecting-ip'];
+  }else{
+    return req.ip || req._remoteAddress || (req.connection && req.connection.remoteAddress) || undefined
+  }
+});
+
+app.use(morgan(formats, {stream: accessLogStream}));
+app.use(morgan(formats));
 
 app.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
@@ -56,6 +72,23 @@ Object.keys(categories).map(function(objectKey, index) {
 				res.send(json);
 			});
 		})
+	});
+});
+
+app.get('/', function(req, res){
+	res.send({
+		name: 'FrenchStream Unofficial Api',
+		version: "1.0.0",
+		github: "https://github.com/iambluedev1/fs-api/",
+		author: {
+			"name": "iambluedev",
+			"email": "iambluedev@gmx.fr",
+			"web": "https://twitter.com/iambluedev"
+		},
+		licenses: {
+			"name": "GNU",
+			"url": "https://www.gnu.org/licenses/gpl-3.0.fr.html"
+		}
 	});
 });
 
@@ -253,8 +286,10 @@ app.get('/raw/:code/:comment?', cache('1 day'), function(req, res){
 				if(req.params.comment !== "comments"){
 					json.title = $('h1').text().trim();
 					json.poster = 'http://french-stream.co/' + $('.fposter > img').attr("src");
-					json.lang = $('.short-qual > a').text().trim();
-					json.type = $('.short-label > a').text().trim();
+					json.description = $('#s-desc').text().trim();
+          json.trailer = $('.fleft').find(".zoombox").attr("href");
+          json.comments = ($('#dle-comments-list > div').length - 1);
+          json.sort = "";
 					tags = [];
 					$('.flist-col > li').each(function (i, elem) {
 						var tmp = $('span', this).text().trim();
@@ -280,7 +315,7 @@ app.get('/raw/:code/:comment?', cache('1 day'), function(req, res){
 
 					for(var z = 0; z < tags.length; z++){
 						var tag = tags[z];
-						if(tag.key == "Avec"){
+						if(tag.key == "Avec" || tag.key == "Acteurs"){
 							var tmp = tag.value.split(', ');
 							json.actors = tmp;
 						}
@@ -290,13 +325,17 @@ app.get('/raw/:code/:comment?', cache('1 day'), function(req, res){
 							json.genres = tmp;
 						}
 
-						if(tag.key == "Réalisé par") {
+						if(tag.key == "Réalisé par" || tag.key == "Réalisateur") {
 							var tmp = tag.value.split(', ');
 							json.realisators = tmp;
 						}
 
 						if(tag.key == "Résumé du Film") {
 							json.description = tag.value;
+            }
+            
+            if(tag.key == "Date de sortie") {
+							json.date = tag.value;
 						}
 					}
 
@@ -330,38 +369,117 @@ app.get('/raw/:code/:comment?', cache('1 day'), function(req, res){
 
 					var tmp = $('#tmp').val();
 					if(tmp != undefined){
+            var players = [];
+
 						tmp = tmp.split('sig=705&&');
 						tmp = Buffer.from(
 							Buffer.from(tmp[1]).toString('base64')
 						).toString('base64');
-						json.players = [];
-						json.players.push("http://french-stream.co/f.php?p_id=1&&c_id=" + tmp);
+            //json.players.push("http://french-stream.co/f.php?p_id=1&&c_id=" + tmp);
+						players.push("/link/" + Buffer.from(JSON.stringify({
+              file: "f.php",
+              player_id: 1,
+              video_id: tmp
+            })).toString("base64"));
 
 						tmp = $('#tmp2').val();
 						tmp = tmp.split('nbsp');
 						tmp = Buffer.from(
 							Buffer.from(tmp[1]).toString('base64')
 						).toString('base64');
-						json.players.push("http://french-stream.co/yy.php?p_id=2&&c_id=" + tmp);
+            //json.players.push("http://french-stream.co/yy.php?p_id=2&&c_id=" + tmp);
+            players.push("/link/" + Buffer.from(JSON.stringify({
+              file: "yy.php",
+              player_id: 2,
+              video_id: tmp
+            })).toString("base64"));
 
 						tmp = $('#tmp4').val();
 						tmp = tmp.split('nbsq');
 						tmp = Buffer.from(
 							Buffer.from(tmp[1]).toString('base64')
 						).toString('base64');
-						json.players.push("http://french-stream.co/yy.php?p_id=3&&c_id=" + tmp);		
-					}
+            //json.players.push("http://french-stream.co/yy.php?p_id=3&&c_id=" + tmp);		
+            players.push("/link/" + Buffer.from(JSON.stringify({
+              file: "yy.php",
+              player_id: 3,
+              video_id: tmp
+            })).toString("base64"));
+
+            json.players = players.filter(function(elem, pos,arr) {
+              return arr.indexOf(elem) == pos;
+            });
+
+            json.lang = $('.short-qual > a').text().trim();
+            json.type = $('.short-label > a').text().trim();
+            json.sort = "film";
+					}else{
+            json.sort= "série";
+            json.plus = $(".fmain").find("p > a").attr("href");
+            json.lang = $('.short-label > a').text().trim();
+            var leftGroup = $(".gGoup").find('div[style*="float:left"]');
+            var rightGroup = $(".gGoup").find('div[style*="float:right"]');
+
+            var leftGroupName = leftGroup.find("div:first-child").text().trim().toLowerCase();
+            var rightGroupName = rightGroup.find("div:first-child").text().trim().toLowerCase();
+
+            json.episodes = {};
+            json.episodes[leftGroupName] = [];
+            $(leftGroup).find("a").each(function (i, elem) {
+              var epEl = $(this);
+              var videoTag = epEl.attr("href");
+
+              var tmp = videoTag.split('nbsp');
+              tmp = Buffer.from(
+                Buffer.from(tmp[1]).toString('base64')
+              ).toString('base64');
+
+              json.episodes[leftGroupName].push({
+                name: epEl.attr("title"),
+                link: "/link/" + Buffer.from(JSON.stringify({
+                  file: "s.php",
+                  player_id: 1,
+                  video_id: tmp
+                })).toString("base64")
+              });
+            });
+
+            json.episodes[rightGroupName] = [];
+            $(rightGroup).find(".fstab").each(function (i, elem) {
+              var epEl = $(this);
+              var videoTag = epEl.attr("href");
+
+              var tmp = videoTag.split('nbsp');
+              tmp = Buffer.from(
+                Buffer.from(tmp[1]).toString('base64')
+              ).toString('base64');
+
+              json.episodes[rightGroupName].push({
+                name: epEl.attr("title"),
+                link: "/link/" + Buffer.from(JSON.stringify({
+                  file: "s.php",
+                  player_id: 1,
+                  video_id: tmp
+                })).toString("base64")
+              });
+            });
+          }
 				}else{
 					json.comments = [];
 					var x = 0;
 					$('#dle-comments-list > div').each(function (i, elem) {
-						var el = $(this);
-						if(!el.attr('id').startsWith("comment-id")){
-							return;
-						}
-
+            var el = $(this);
+            var id = el.attr('id');
+            if(id != undefined && id != ""){
+              if(!id.startsWith("comment-id")){
+							  return;
+              }
+            }else{
+              return;
+            }
+            
 						json.comments.push({});
-						json.comments[x].id = parseInt(el.attr('id').replace("comment-id-", ""));
+						json.comments[x].id = parseInt(id.replace("comment-id-", ""));
 
 						var avatar =  $('img', this).attr('src');
 						if(!avatar.startsWith("//")){
@@ -371,7 +489,8 @@ app.get('/raw/:code/:comment?', cache('1 day'), function(req, res){
 						json.comments[x].avatar = avatar;
 						json.comments[x].username = $('img', this).attr('alt');
 						json.comments[x].message = $('.full-text > span > div', this).html();
-						json.comments[x].date = $('.comm-right > ul > li > b:last', this).text().trim();
+            json.comments[x].date = $('.comm-right > ul > li > b:last', this).text().trim();
+            json.comments[x].rate = parseInt($('span.ratingtypeplusminus', this).text().trim());
 						x++;
 					});
 				}
@@ -381,6 +500,42 @@ app.get('/raw/:code/:comment?', cache('1 day'), function(req, res){
 	}
 });
 
-app.listen('8080');
-console.log('Listening on localhost:8080');
+app.get('/link/:code', cache('1 day'), function(req, res){
+	var code = req.params.code;
+	if(!code){
+		res.send({
+			error: 'Param not valid !'
+		});
+		return;
+  }
+
+  try {
+    code = JSON.parse(Buffer.from(req.params.code, "base64").toString());
+  } catch (e){
+    res.send({
+			error: 'Param not valid !'
+		});
+		return;
+  }
+
+  var url = "http://french-stream.co/" + code.file + "?p_id=" + code.player_id + "&&c_id=" + code.video_id;
+
+  request.get({
+    url: url,
+    followAllRedirects: false,
+    headers: {
+      'Referer': 'http://www.french-stream.co/'
+    },
+  }, function(error, response, html){
+    if(!error) {
+      res.send({
+        from: url,
+        target: decodeURIComponent(response.request.uri.href)
+      });
+    }
+  });
+});
+
+app.listen('8854');
+console.log('Listening on localhost:8854');
 exports = module.exports = app;
