@@ -15,7 +15,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "pm2": "pm2 start index.js --name \"fs-api\" -i 10"
   },
   "licenses": [
     {
