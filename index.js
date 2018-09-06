@@ -68,12 +68,12 @@ Object.keys(categories).map(function (objectKey, index) {
     var mapping = value.mappings[objectKey];
     app.get('/get/' + value.flag + '/' + mapping.requestId, cache('1 day'), function (req, res) {
       request.post({
-        url: 'http://www.french-stream.co/engine/ajax/custom.php',
+        url: 'http://www.french-stream.tv/engine/ajax/custom.php',
         form: {
           castom: "custom+category='" + mapping.fsCatId + "'+template='" + mapping.fsTemplate + "'+from='" + mapping.fsFrom + "'+limit='" + mapping.fsLimit + "'"
         },
         headers: {
-          'Referer': 'http://www.french-stream.co/',
+          'Referer': 'http://www.french-stream.tv/',
           'User-Agent': randomUA.getRandom(),
         },
         timeout: 10000
@@ -114,7 +114,7 @@ Object.keys(categories).map(function (objectKey, index) {
             url = url.match(/\/?[0-9]+/g)[0];
             url = url.replace("/", "");
             json[i].id = url;
-            json[i].img = 'http://french-stream.co/' + $('img', this).attr('src');
+            json[i].img = 'http://french-stream.tv/' + $('img', this).attr('src');
           });
           res.send(json);
         } else {
@@ -132,7 +132,7 @@ app.get('/fetch/boxoffice/:page?', cache('1 day'), function (req, res) {
   var page = parseInt(req.params.page);
   var url = '';
   if (!page) {
-    url = 'http://french-stream.co';
+    url = 'http://french-stream.tv';
   } else {
     if (isNaN(page) || page < 0) {
       res.status(400).send({
@@ -140,13 +140,13 @@ app.get('/fetch/boxoffice/:page?', cache('1 day'), function (req, res) {
       });
       return;
     } else {
-      url = 'http://french-stream.co/page/' + page;
+      url = 'http://french-stream.tv/page/' + page;
     }
   }
   request.get({
     url: url,
     headers: {
-      'Referer': 'http://www.french-stream.co/',
+      'Referer': 'http://www.french-stream.tv/',
       'User-Agent': randomUA.getRandom()
     },
     timeout: 10000
@@ -164,7 +164,7 @@ app.get('/fetch/boxoffice/:page?', cache('1 day'), function (req, res) {
         url = url.match(/\/?[0-9]+/g)[0];
         url = url.replace("/", "");
         json[i].id = url;
-        json[i].img = 'http://french-stream.co/' + $('img', this).attr('src');
+        json[i].img = 'http://french-stream.tv/' + $('img', this).attr('src');
       });
       if (json.length == 0 && page) {
         json = {
@@ -185,9 +185,9 @@ app.get('/fetch/movies/:page', cache('1 day'), function (req, res) {
     return;
   }
   request.get({
-    url: 'http://french-stream.co/films/page/' + page,
+    url: 'http://french-stream.tv/films/page/' + page,
     headers: {
-      'Referer': 'http://www.french-stream.co/',
+      'Referer': 'http://www.french-stream.tv/',
       'User-Agent': randomUA.getRandom()
     },
     timeout: 10000
@@ -204,7 +204,7 @@ app.get('/fetch/movies/:page', cache('1 day'), function (req, res) {
         url = url.match(/\/?[0-9]+/g)[0];
         url = url.replace("/", "");
         json[i].id = url;
-        json[i].img = 'http://french-stream.co/' + $('img', this).attr('src');
+        json[i].img = 'http://french-stream.tv/' + $('img', this).attr('src');
       });
       if (json.length == 0) {
         json = {
@@ -225,9 +225,9 @@ app.get('/fetch/series/:page', cache('1 day'), function (req, res) {
     return;
   }
   request.get({
-    url: 'http://french-stream.co/series/page/' + page,
+    url: 'http://french-stream.tv/series/page/' + page,
     headers: {
-      'Referer': 'http://www.french-stream.co/',
+      'Referer': 'http://www.french-stream.tv/',
       'User-Agent': randomUA.getRandom()
     },
     timeout: 10000
@@ -245,7 +245,7 @@ app.get('/fetch/series/:page', cache('1 day'), function (req, res) {
         url = url.match(/\/?[0-9]+/g)[0];
         url = url.replace("/", "");
         json[i].id = url;
-        json[i].img = 'http://french-stream.co/' + $('img', this).attr('src');
+        json[i].img = 'http://french-stream.tv/' + $('img', this).attr('src');
       });
       if (json.length == 0) {
         json = {
@@ -266,9 +266,9 @@ app.get('/fetch/mangas/:page', cache('1 day'), function (req, res) {
     return;
   }
   request.get({
-    url: 'http://french-stream.co/mangas/page/' + page,
+    url: 'http://french-stream.tv/mangas/page/' + page,
     headers: {
-      'Referer': 'http://www.french-stream.co/',
+      'Referer': 'http://www.french-stream.tv/',
       'User-Agent': randomUA.getRandom()
     },
     timeout: 10000
@@ -286,7 +286,7 @@ app.get('/fetch/mangas/:page', cache('1 day'), function (req, res) {
         url = url.match(/\/?[0-9]+/g)[0];
         url = url.replace("/", "");
         json[i].id = url;
-        json[i].img = 'http://french-stream.co/' + $('img', this).attr('src');
+        json[i].img = 'http://french-stream.tv/' + $('img', this).attr('src');
       });
       if (json.length == 0) {
         json = {
@@ -307,7 +307,7 @@ Object.keys(genres).map(function (objectKey, index) {
       var page = parseInt(req.params.page);
       var url = '';
       if (!page) {
-        url = 'http://french-stream.co' + item.baseUrl;
+        url = 'http://french-stream.tv' + item.baseUrl;
       } else {
         if (isNaN(page) || page < 0) {
           res.status(400).send({
@@ -315,14 +315,14 @@ Object.keys(genres).map(function (objectKey, index) {
           });
           return;
         } else {
-          url = 'http://french-stream.co' + item.baseUrl + 'page/' + page;
+          url = 'http://french-stream.tv' + item.baseUrl + 'page/' + page;
         }
       }
 
       request.get({
         url: url,
         headers: {
-          'Referer': 'http://www.french-stream.co/',
+          'Referer': 'http://www.french-stream.tv/',
           'User-Agent': randomUA.getRandom()
         },
         timeout: 10000
@@ -345,7 +345,7 @@ Object.keys(genres).map(function (objectKey, index) {
             url = url.match(/\/?[0-9]+/g)[0];
             url = url.replace("/", "");
             json[i].id = url;
-            json[i].img = 'http://french-stream.co/' + $('img', this).attr('src');
+            json[i].img = 'http://french-stream.tv/' + $('img', this).attr('src');
           });
           if (json.length == 0) {
             json = {
@@ -375,9 +375,9 @@ app.get('/raw/:code/:comment?', cache('1 day'), function (req, res) {
     }
 
     request.get({
-      url: 'http://french-stream.co/' + code + '-.html',
+      url: 'http://french-stream.tv/' + code + '-.html',
       headers: {
-        'Referer': 'http://www.french-stream.co/',
+        'Referer': 'http://www.french-stream.tv/',
         'User-Agent': randomUA.getRandom()
       },
       timeout: 10000
@@ -388,7 +388,7 @@ app.get('/raw/:code/:comment?', cache('1 day'), function (req, res) {
 
         if (req.params.comment !== "comments") {
           json.title = $('h1').text().trim();
-          json.poster = 'http://french-stream.co/' + $('.fposter > img').attr("src");
+          json.poster = 'http://french-stream.tv/' + $('.fposter > img').attr("src");
           json.description = $('#s-desc').text().trim();
           json.trailer = $('.fleft').find(".zoombox").attr("href");
           json.comments = ($('#dle-comments-list > div').length - 1);
@@ -600,7 +600,7 @@ app.get('/raw/:code/:comment?', cache('1 day'), function (req, res) {
 
             var avatar = $('img', this).attr('src');
             if (!avatar.startsWith("//")) {
-              avatar = "http://french-stream.co/" + avatar;
+              avatar = "http://french-stream.tv/" + avatar;
             }
 
             json.comments[x].avatar = avatar;
@@ -641,12 +641,12 @@ app.get('/link/:code', cache('1 day'), function (req, res) {
     return;
   }
 
-  var url = "http://french-stream.co/" + code.file + "?p_id=" + code.player_id + "&&c_id=" + code.video_id;
+  var url = "http://french-stream.tv/" + code.file + "?p_id=" + code.player_id + "&&c_id=" + code.video_id;
 
   request.get({
     url: url,
     headers: {
-      'Referer': 'http://www.french-stream.co/',
+      'Referer': 'http://www.french-stream.tv/',
       'User-Agent': randomUA.getRandom()
     },
     timeout: 10000
