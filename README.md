@@ -1,4 +1,6 @@
-# FrenchStream Unofficial Api
+# FrenchStream Unofficial Api (OUTDATED)
+
+/!\ french-stream.co is now closed and splitted into 3 differents websites : french-serie.co, french-film.co and french-manga.co. Their structure is different, so this api is unusable at the moment. I will fix it as soon I have some time.
 
 Webscraper for the website [french-stream.co](http://french-stream.co/)
 
